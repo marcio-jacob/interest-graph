@@ -1,0 +1,986 @@
+# =============================================================================
+# Taxonomy — topics, countries, sounds, hashtags, entities, username patterns
+# Load with: yaml.safe_load(open("config/taxonomy.yaml"))
+# Access via: taxonomy['topics'], taxonomy['countries'], etc.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Topics  (12)
+# -----------------------------------------------------------------------------
+topics:
+  - topic_id: T01
+    name: Cooking & Food
+    slug: cooking_food
+  - topic_id: T02
+    name: Gaming & Esports
+    slug: gaming_esports
+  - topic_id: T03
+    name: Fashion & Beauty
+    slug: fashion_beauty
+  - topic_id: T04
+    name: Fitness & Wellness
+    slug: fitness_wellness
+  - topic_id: T05
+    name: Travel & Adventure
+    slug: travel_adventure
+  - topic_id: T06
+    name: Music & Dance
+    slug: music_dance
+  - topic_id: T07
+    name: Comedy & Entertainment
+    slug: comedy_entertainment
+  - topic_id: T08
+    name: Technology & Science
+    slug: technology_science
+  - topic_id: T09
+    name: Sports & Athletics
+    slug: sports_athletics
+  - topic_id: T10
+    name: Education & Tutorials
+    slug: education_tutorials
+  - topic_id: T11
+    name: Art & Creativity
+    slug: art_creativity
+  - topic_id: T12
+    name: Lifestyle & Vlog
+    slug: lifestyle_vlog
+
+# -----------------------------------------------------------------------------
+# Countries  (12) — iso is the 2-letter code used as country_id in the graph
+# affinity_topics lists slugs most common for creators from that country
+# user_weight is relative probability of a user being from this country
+# -----------------------------------------------------------------------------
+countries:
+  - country_id: US
+    name: United States
+    iso: US
+    affinity_topics:
+      - technology_science
+      - comedy_entertainment
+      - sports_athletics
+      - fitness_wellness
+      - lifestyle_vlog
+    user_weight: 0.20
+
+  - country_id: BR
+    name: Brazil
+    iso: BR
+    affinity_topics:
+      - sports_athletics
+      - music_dance
+      - comedy_entertainment
+      - lifestyle_vlog
+    user_weight: 0.10
+
+  - country_id: ID
+    name: Indonesia
+    iso: ID
+    affinity_topics:
+      - cooking_food
+      - fashion_beauty
+      - lifestyle_vlog
+      - education_tutorials
+    user_weight: 0.08
+
+  - country_id: VN
+    name: Vietnam
+    iso: VN
+    affinity_topics:
+      - cooking_food
+      - travel_adventure
+      - lifestyle_vlog
+    user_weight: 0.05
+
+  - country_id: PH
+    name: Philippines
+    iso: PH
+    affinity_topics:
+      - comedy_entertainment
+      - music_dance
+      - education_tutorials
+    user_weight: 0.06
+
+  - country_id: GB
+    name: United Kingdom
+    iso: GB
+    affinity_topics:
+      - fashion_beauty
+      - comedy_entertainment
+      - technology_science
+      - lifestyle_vlog
+    user_weight: 0.08
+
+  - country_id: DE
+    name: Germany
+    iso: DE
+    affinity_topics:
+      - technology_science
+      - fitness_wellness
+      - education_tutorials
+    user_weight: 0.06
+
+  - country_id: JP
+    name: Japan
+    iso: JP
+    affinity_topics:
+      - gaming_esports
+      - art_creativity
+      - cooking_food
+    user_weight: 0.07
+
+  - country_id: MX
+    name: Mexico
+    iso: MX
+    affinity_topics:
+      - cooking_food
+      - music_dance
+      - comedy_entertainment
+    user_weight: 0.07
+
+  - country_id: IN
+    name: India
+    iso: IN
+    affinity_topics:
+      - education_tutorials
+      - music_dance
+      - comedy_entertainment
+    user_weight: 0.10
+
+  - country_id: KR
+    name: South Korea
+    iso: KR
+    affinity_topics:
+      - music_dance
+      - fashion_beauty
+      - gaming_esports
+    user_weight: 0.07
+
+  - country_id: NG
+    name: Nigeria
+    iso: NG
+    affinity_topics:
+      - music_dance
+      - comedy_entertainment
+      - lifestyle_vlog
+    user_weight: 0.06
+
+# -----------------------------------------------------------------------------
+# Hashtags  (10 per topic = 120 total)
+# hashtag_id is assigned at generation time; name includes the # prefix
+# -----------------------------------------------------------------------------
+hashtags:
+  cooking_food:
+    - "#foodtok"
+    - "#cooking"
+    - "#recipe"
+    - "#mealprep"
+    - "#foodie"
+    - "#homecooking"
+    - "#chef"
+    - "#easyrecipe"
+    - "#foodlover"
+    - "#kitchenhacks"
+
+  gaming_esports:
+    - "#gaming"
+    - "#gamer"
+    - "#gameplay"
+    - "#pcgaming"
+    - "#esports"
+    - "#streamer"
+    - "#gamingsetup"
+    - "#noob2pro"
+    - "#fps"
+    - "#rpg"
+
+  fashion_beauty:
+    - "#ootd"
+    - "#fashiontok"
+    - "#grwm"
+    - "#makeup"
+    - "#skincare"
+    - "#styleinspo"
+    - "#thriftflip"
+    - "#nailart"
+    - "#aesthetic"
+    - "#haul"
+
+  fitness_wellness:
+    - "#fittok"
+    - "#gym"
+    - "#workout"
+    - "#gains"
+    - "#homeworkout"
+    - "#mentalhealth"
+    - "#yoga"
+    - "#proteinrecipe"
+    - "#fitcheck"
+    - "#noexcuses"
+
+  travel_adventure:
+    - "#traveltok"
+    - "#wanderlust"
+    - "#bucketlist"
+    - "#solotravel"
+    - "#travelvibes"
+    - "#hiddengem"
+    - "#roadtrip"
+    - "#backpacker"
+    - "#travelcouple"
+    - "#explore"
+
+  music_dance:
+    - "#fyp"
+    - "#dancechallenge"
+    - "#newmusic"
+    - "#dancecover"
+    - "#playlist"
+    - "#musiclover"
+    - "#singwithme"
+    - "#vocalcover"
+    - "#trending"
+    - "#vibes"
+
+  comedy_entertainment:
+    - "#funnyvideo"
+    - "#comedy"
+    - "#laughing"
+    - "#relatable"
+    - "#storytime"
+    - "#dramacheck"
+    - "#prank"
+    - "#roleplay"
+    - "#skit"
+    - "#blowthisup"
+
+  technology_science:
+    - "#techtok"
+    - "#coding"
+    - "#aitools"
+    - "#programmer"
+    - "#techreview"
+    - "#sciencefact"
+    - "#innovation"
+    - "#robotics"
+    - "#softwareengineer"
+    - "#python"
+
+  sports_athletics:
+    - "#sports"
+    - "#football"
+    - "#basketball"
+    - "#training"
+    - "#athlete"
+    - "#sportsclip"
+    - "#matchday"
+    - "#skills"
+    - "#highlights"
+    - "#fitness"
+
+  education_tutorials:
+    - "#learntok"
+    - "#studywithme"
+    - "#tutorial"
+    - "#learnontiktok"
+    - "#factcheck"
+    - "#studytips"
+    - "#howto"
+    - "#explained"
+    - "#mindblown"
+    - "#dyk"
+
+  art_creativity:
+    - "#arttok"
+    - "#digitalart"
+    - "#drawing"
+    - "#satisfying"
+    - "#diy"
+    - "#craftok"
+    - "#artistsoftiktok"
+    - "#procreate"
+    - "#painting"
+    - "#creative"
+
+  lifestyle_vlog:
+    - "#dayinmylife"
+    - "#vlog"
+    - "#morningroutine"
+    - "#lifestyletok"
+    - "#manifestation"
+    - "#aesthetic"
+    - "#productivity"
+    - "#selfcare"
+    - "#grwm"
+    - "#nightroutine"
+
+# -----------------------------------------------------------------------------
+# Entities  (5 per topic = 60 total)
+# aliases is a list of alternative names / related terms (used to simulate NER)
+# primary_topic is the main topic slug; secondary_topics lists cross-links
+# -----------------------------------------------------------------------------
+entities:
+  - entity_id: E001
+    name: Gordon Ramsay
+    aliases: ["Chef Ramsay", "Hell's Kitchen", "MasterChef"]
+    primary_topic: cooking_food
+    secondary_topics: [comedy_entertainment]
+
+  - entity_id: E002
+    name: MasterChef
+    aliases: ["cooking competition", "MasterChef US"]
+    primary_topic: cooking_food
+    secondary_topics: []
+
+  - entity_id: E003
+    name: Jamie Oliver
+    aliases: ["Naked Chef", "Jamie's Kitchen"]
+    primary_topic: cooking_food
+    secondary_topics: []
+
+  - entity_id: E004
+    name: Michelin Star
+    aliases: ["fine dining", "Michelin Guide", "3-star restaurant"]
+    primary_topic: cooking_food
+    secondary_topics: [travel_adventure]
+
+  - entity_id: E005
+    name: Street Food
+    aliases: ["food truck", "hawker food", "night market"]
+    primary_topic: cooking_food
+    secondary_topics: [travel_adventure]
+
+  - entity_id: E006
+    name: Minecraft
+    aliases: ["MC", "Mojang", "Creeper", "Steve"]
+    primary_topic: gaming_esports
+    secondary_topics: [art_creativity]
+
+  - entity_id: E007
+    name: League of Legends
+    aliases: ["LoL", "Riot Games", "Summoner's Rift"]
+    primary_topic: gaming_esports
+    secondary_topics: []
+
+  - entity_id: E008
+    name: Twitch
+    aliases: ["live streaming", "stream", "Twitch.tv"]
+    primary_topic: gaming_esports
+    secondary_topics: [comedy_entertainment]
+
+  - entity_id: E009
+    name: Valorant
+    aliases: ["Riot FPS", "Valorant ranked", "Jett main"]
+    primary_topic: gaming_esports
+    secondary_topics: []
+
+  - entity_id: E010
+    name: Steam
+    aliases: ["Valve", "PC gaming", "Steam sale"]
+    primary_topic: gaming_esports
+    secondary_topics: [technology_science]
+
+  - entity_id: E011
+    name: Zara
+    aliases: ["Inditex", "fast fashion", "Zara haul"]
+    primary_topic: fashion_beauty
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E012
+    name: Sephora
+    aliases: ["beauty retailer", "Sephora haul", "beauty products"]
+    primary_topic: fashion_beauty
+    secondary_topics: []
+
+  - entity_id: E013
+    name: Vogue
+    aliases: ["fashion magazine", "Vogue cover", "Anna Wintour"]
+    primary_topic: fashion_beauty
+    secondary_topics: [art_creativity]
+
+  - entity_id: E014
+    name: H&M
+    aliases: ["sustainable fashion", "H&M collection"]
+    primary_topic: fashion_beauty
+    secondary_topics: []
+
+  - entity_id: E015
+    name: Gucci
+    aliases: ["luxury fashion", "GG logo", "Gucci Gang"]
+    primary_topic: fashion_beauty
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E016
+    name: CrossFit
+    aliases: ["WOD", "box gym", "CrossFit Open"]
+    primary_topic: fitness_wellness
+    secondary_topics: [sports_athletics]
+
+  - entity_id: E017
+    name: Nike
+    aliases: ["Just Do It", "swoosh", "Nike Air", "Nike Run"]
+    primary_topic: fitness_wellness
+    secondary_topics: [sports_athletics, fashion_beauty]
+
+  - entity_id: E018
+    name: Pilates
+    aliases: ["reformer Pilates", "core workout", "Pilates studio"]
+    primary_topic: fitness_wellness
+    secondary_topics: []
+
+  - entity_id: E019
+    name: Adidas
+    aliases: ["three stripes", "Adidas Originals", "Yeezy"]
+    primary_topic: fitness_wellness
+    secondary_topics: [fashion_beauty, sports_athletics]
+
+  - entity_id: E020
+    name: Whoop
+    aliases: ["fitness tracker", "recovery band", "HRV"]
+    primary_topic: fitness_wellness
+    secondary_topics: [technology_science]
+
+  - entity_id: E021
+    name: Bali
+    aliases: ["Bali Indonesia", "Island of Gods", "Ubud", "Seminyak"]
+    primary_topic: travel_adventure
+    secondary_topics: [lifestyle_vlog, cooking_food]
+
+  - entity_id: E022
+    name: Santorini
+    aliases: ["Greek islands", "Oia", "blue domes"]
+    primary_topic: travel_adventure
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E023
+    name: Tokyo
+    aliases: ["Japan travel", "Shibuya", "Harajuku", "Akihabara"]
+    primary_topic: travel_adventure
+    secondary_topics: [cooking_food, art_creativity]
+
+  - entity_id: E024
+    name: Airbnb
+    aliases: ["short term rental", "Airbnb stay", "vacation rental"]
+    primary_topic: travel_adventure
+    secondary_topics: []
+
+  - entity_id: E025
+    name: Machu Picchu
+    aliases: ["Peru", "Inca trail", "lost city", "Cusco"]
+    primary_topic: travel_adventure
+    secondary_topics: [education_tutorials]
+
+  - entity_id: E026
+    name: BTS
+    aliases: ["Bangtan", "K-pop", "HYBE", "Army", "BTS members"]
+    primary_topic: music_dance
+    secondary_topics: [lifestyle_vlog, fashion_beauty]
+
+  - entity_id: E027
+    name: Bad Bunny
+    aliases: ["El Conejo Malo", "reggaeton", "Benito"]
+    primary_topic: music_dance
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E028
+    name: Coachella
+    aliases: ["music festival", "desert festival", "Coachella Valley"]
+    primary_topic: music_dance
+    secondary_topics: [lifestyle_vlog, travel_adventure]
+
+  - entity_id: E029
+    name: Drake
+    aliases: ["Drizzy", "OVO", "6 God", "Champagne Papi"]
+    primary_topic: music_dance
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E030
+    name: BLACKPINK
+    aliases: ["Blink", "YG Entertainment", "Lisa", "Jennie"]
+    primary_topic: music_dance
+    secondary_topics: [fashion_beauty, lifestyle_vlog]
+
+  - entity_id: E031
+    name: MrBeast
+    aliases: ["Jimmy Donaldson", "Beast Philanthropy", "MrBeast Burger"]
+    primary_topic: comedy_entertainment
+    secondary_topics: [education_tutorials]
+
+  - entity_id: E032
+    name: Netflix
+    aliases: ["streaming", "binge-watch", "Netflix original"]
+    primary_topic: comedy_entertainment
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E033
+    name: Saturday Night Live
+    aliases: ["SNL", "NBC comedy", "Weekend Update"]
+    primary_topic: comedy_entertainment
+    secondary_topics: []
+
+  - entity_id: E034
+    name: Charli D'Amelio
+    aliases: ["TikTok star", "Charli dances"]
+    primary_topic: comedy_entertainment
+    secondary_topics: [music_dance, lifestyle_vlog]
+
+  - entity_id: E035
+    name: Funny or Die
+    aliases: ["comedy web", "Will Ferrell comedy"]
+    primary_topic: comedy_entertainment
+    secondary_topics: []
+
+  - entity_id: E036
+    name: OpenAI
+    aliases: ["ChatGPT", "GPT-4", "GPT-4o", "DALL-E", "AI"]
+    primary_topic: technology_science
+    secondary_topics: [education_tutorials]
+
+  - entity_id: E037
+    name: Tesla
+    aliases: ["Elon Musk", "EV", "Autopilot", "Model 3", "Cybertruck"]
+    primary_topic: technology_science
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E038
+    name: Apple
+    aliases: ["iPhone", "iOS", "Tim Cook", "MacBook", "Vision Pro"]
+    primary_topic: technology_science
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E039
+    name: SpaceX
+    aliases: ["Starship", "Falcon 9", "Elon Musk", "rocket launch"]
+    primary_topic: technology_science
+    secondary_topics: [education_tutorials]
+
+  - entity_id: E040
+    name: Meta
+    aliases: ["Facebook", "Instagram", "Zuckerberg", "Metaverse", "Threads"]
+    primary_topic: technology_science
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E041
+    name: Cristiano Ronaldo
+    aliases: ["CR7", "Siuuu", "Al-Nassr", "GOAT debate"]
+    primary_topic: sports_athletics
+    secondary_topics: [lifestyle_vlog, fitness_wellness]
+
+  - entity_id: E042
+    name: Lionel Messi
+    aliases: ["GOAT", "Leo Messi", "Inter Miami", "La Pulga"]
+    primary_topic: sports_athletics
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E043
+    name: LeBron James
+    aliases: ["King James", "The King", "Lakers", "Bron"]
+    primary_topic: sports_athletics
+    secondary_topics: [lifestyle_vlog]
+
+  - entity_id: E044
+    name: FIFA World Cup
+    aliases: ["World Cup", "Qatar 2022", "football tournament"]
+    primary_topic: sports_athletics
+    secondary_topics: []
+
+  - entity_id: E045
+    name: NBA
+    aliases: ["basketball", "NBA playoffs", "slam dunk"]
+    primary_topic: sports_athletics
+    secondary_topics: []
+
+  - entity_id: E046
+    name: Khan Academy
+    aliases: ["free education", "Sal Khan", "study resource"]
+    primary_topic: education_tutorials
+    secondary_topics: []
+
+  - entity_id: E047
+    name: Duolingo
+    aliases: ["language app", "green owl", "Duo", "streak"]
+    primary_topic: education_tutorials
+    secondary_topics: [comedy_entertainment]
+
+  - entity_id: E048
+    name: TED Talk
+    aliases: ["TED", "ideas worth spreading", "TEDx"]
+    primary_topic: education_tutorials
+    secondary_topics: [technology_science]
+
+  - entity_id: E049
+    name: Coursera
+    aliases: ["online learning", "Coursera certificate"]
+    primary_topic: education_tutorials
+    secondary_topics: [technology_science]
+
+  - entity_id: E050
+    name: MIT OpenCourseWare
+    aliases: ["MIT OCW", "free MIT", "open learning"]
+    primary_topic: education_tutorials
+    secondary_topics: [technology_science]
+
+  - entity_id: E051
+    name: Procreate
+    aliases: ["digital art app", "iPad art", "Procreate brush"]
+    primary_topic: art_creativity
+    secondary_topics: []
+
+  - entity_id: E052
+    name: Banksy
+    aliases: ["street art", "graffiti artist", "anonymous artist"]
+    primary_topic: art_creativity
+    secondary_topics: []
+
+  - entity_id: E053
+    name: Adobe Creative Suite
+    aliases: ["Photoshop", "Illustrator", "Adobe", "After Effects"]
+    primary_topic: art_creativity
+    secondary_topics: [technology_science]
+
+  - entity_id: E054
+    name: Louvre
+    aliases: ["Paris museum", "Mona Lisa", "Musée du Louvre"]
+    primary_topic: art_creativity
+    secondary_topics: [travel_adventure]
+
+  - entity_id: E055
+    name: Canva
+    aliases: ["design tool", "free design", "Canva template"]
+    primary_topic: art_creativity
+    secondary_topics: [education_tutorials]
+
+  - entity_id: E056
+    name: Morning Routine
+    aliases: ["5am club", "productive morning", "wake up routine"]
+    primary_topic: lifestyle_vlog
+    secondary_topics: [fitness_wellness]
+
+  - entity_id: E057
+    name: GRWM
+    aliases: ["Get Ready With Me", "get ready with me video"]
+    primary_topic: lifestyle_vlog
+    secondary_topics: [fashion_beauty]
+
+  - entity_id: E058
+    name: New York City
+    aliases: ["NYC", "Big Apple", "Manhattan", "Brooklyn"]
+    primary_topic: lifestyle_vlog
+    secondary_topics: [travel_adventure]
+
+  - entity_id: E059
+    name: Aesthetic
+    aliases: ["cottagecore", "dark academia", "Y2K aesthetic", "coquette"]
+    primary_topic: lifestyle_vlog
+    secondary_topics: [art_creativity, fashion_beauty]
+
+  - entity_id: E060
+    name: Manifestation
+    aliases: ["law of attraction", "vision board", "scripting", "75 Hard"]
+    primary_topic: lifestyle_vlog
+    secondary_topics: [fitness_wellness]
+
+# -----------------------------------------------------------------------------
+# Sounds  (30)
+# country_id maps to the Country node in the graph via SONG_MADE_ON
+# -----------------------------------------------------------------------------
+sounds:
+  - song_id: S001
+    song_name: Dynamite
+    singer: BTS
+    genre: K-pop
+    country_id: KR
+
+  - song_id: S002
+    song_name: Pink Venom
+    singer: BLACKPINK
+    genre: K-pop
+    country_id: KR
+
+  - song_id: S003
+    song_name: Hype Boy
+    singer: NewJeans
+    genre: K-pop
+    country_id: KR
+
+  - song_id: S004
+    song_name: "Tití Me Preguntó"
+    singer: Bad Bunny
+    genre: Reggaeton
+    country_id: MX
+
+  - song_id: S005
+    song_name: Provenza
+    singer: Karol G
+    genre: Reggaeton
+    country_id: MX
+
+  - song_id: S006
+    song_name: God's Plan
+    singer: Drake
+    genre: Hip-Hop
+    country_id: US
+
+  - song_id: S007
+    song_name: SICKO MODE
+    singer: Travis Scott
+    genre: Hip-Hop
+    country_id: US
+
+  - song_id: S008
+    song_name: As It Was
+    singer: Harry Styles
+    genre: Pop
+    country_id: GB
+
+  - song_id: S009
+    song_name: Levitating
+    singer: Dua Lipa
+    genre: Pop
+    country_id: GB
+
+  - song_id: S010
+    song_name: drivers license
+    singer: Olivia Rodrigo
+    genre: Pop
+    country_id: US
+
+  - song_id: S011
+    song_name: Titanium
+    singer: David Guetta ft. Sia
+    genre: EDM
+    country_id: US
+
+  - song_id: S012
+    song_name: Blinding Lights
+    singer: The Weeknd
+    genre: Synth-Pop
+    country_id: US
+
+  - song_id: S013
+    song_name: Girl From Rio
+    singer: Anitta
+    genre: Brazilian Pop
+    country_id: BR
+
+  - song_id: S014
+    song_name: Funk Carioca Beat
+    singer: MC Bin Laden
+    genre: Funk
+    country_id: BR
+
+  - song_id: S015
+    song_name: Last Last
+    singer: Burna Boy
+    genre: Afrobeats
+    country_id: NG
+
+  - song_id: S016
+    song_name: Essence
+    singer: Wizkid ft. Tems
+    genre: Afrobeats
+    country_id: NG
+
+  - song_id: S017
+    song_name: Butter
+    singer: BTS
+    genre: K-pop
+    country_id: KR
+
+  - song_id: S018
+    song_name: Moonlight Sonata
+    singer: Beethoven
+    genre: Classical
+    country_id: DE
+
+  - song_id: S019
+    song_name: Jai Ho
+    singer: AR Rahman
+    genre: Bollywood
+    country_id: IN
+
+  - song_id: S020
+    song_name: Gangnam Style
+    singer: PSY
+    genre: K-pop
+    country_id: KR
+
+  - song_id: S021
+    song_name: Con Calma
+    singer: Daddy Yankee
+    genre: Reggaeton
+    country_id: MX
+
+  - song_id: S022
+    song_name: Die With A Smile
+    singer: Lady Gaga & Bruno Mars
+    genre: Pop
+    country_id: US
+
+  - song_id: S023
+    song_name: Bohemian Rhapsody
+    singer: Queen
+    genre: Rock
+    country_id: GB
+
+  - song_id: S024
+    song_name: "505"
+    singer: Arctic Monkeys
+    genre: Indie Rock
+    country_id: GB
+
+  - song_id: S025
+    song_name: Less Is More
+    singer: Tame Impala
+    genre: Psychedelic
+    country_id: US
+
+  - song_id: S026
+    song_name: Rasputin
+    singer: Boney M
+    genre: Disco
+    country_id: DE
+
+  - song_id: S027
+    song_name: Running Up That Hill
+    singer: Kate Bush
+    genre: Art Pop
+    country_id: GB
+
+  - song_id: S028
+    song_name: STAY
+    singer: The Kid LAROI & Justin Bieber
+    genre: Pop
+    country_id: US
+
+  - song_id: S029
+    song_name: Sweet Child O' Mine
+    singer: Guns N' Roses
+    genre: Rock
+    country_id: US
+
+  - song_id: S030
+    song_name: Counting Stars
+    singer: OneRepublic
+    genre: Pop Rock
+    country_id: US
+
+# -----------------------------------------------------------------------------
+# Topic–sound affinity
+# Sounds are weighted toward topics when a video's topic matches.
+# Higher weight = more likely to be chosen for that topic.
+# Unmentioned sounds get weight 1 (baseline).
+# -----------------------------------------------------------------------------
+sound_topic_affinity:
+  music_dance:
+    - {song_id: S001, weight: 5}
+    - {song_id: S002, weight: 5}
+    - {song_id: S003, weight: 5}
+    - {song_id: S004, weight: 4}
+    - {song_id: S005, weight: 4}
+    - {song_id: S006, weight: 3}
+    - {song_id: S007, weight: 3}
+    - {song_id: S015, weight: 3}
+    - {song_id: S016, weight: 3}
+    - {song_id: S017, weight: 4}
+    - {song_id: S019, weight: 3}
+    - {song_id: S020, weight: 3}
+  fitness_wellness:
+    - {song_id: S006, weight: 3}
+    - {song_id: S007, weight: 3}
+    - {song_id: S011, weight: 4}
+    - {song_id: S012, weight: 3}
+  comedy_entertainment:
+    - {song_id: S020, weight: 4}
+    - {song_id: S026, weight: 3}
+    - {song_id: S023, weight: 2}
+  travel_adventure:
+    - {song_id: S008, weight: 3}
+    - {song_id: S009, weight: 3}
+    - {song_id: S025, weight: 3}
+    - {song_id: S027, weight: 2}
+  lifestyle_vlog:
+    - {song_id: S008, weight: 3}
+    - {song_id: S009, weight: 3}
+    - {song_id: S010, weight: 3}
+    - {song_id: S022, weight: 3}
+    - {song_id: S030, weight: 3}
+  sports_athletics:
+    - {song_id: S006, weight: 3}
+    - {song_id: S007, weight: 3}
+    - {song_id: S011, weight: 3}
+    - {song_id: S012, weight: 2}
+  cooking_food:
+    - {song_id: S018, weight: 2}
+    - {song_id: S025, weight: 2}
+  technology_science:
+    - {song_id: S018, weight: 2}
+    - {song_id: S025, weight: 2}
+  art_creativity:
+    - {song_id: S018, weight: 3}
+    - {song_id: S024, weight: 3}
+    - {song_id: S025, weight: 3}
+    - {song_id: S027, weight: 3}
+
+# -----------------------------------------------------------------------------
+# Username patterns — used by generators/users.py
+# Tokens: {first} {last} {nn} {noun} {topic_word} {adjective} {country_adj}
+# -----------------------------------------------------------------------------
+username_patterns:
+  - "{first}{last}{nn}"
+  - "{first}.{topic_word}"
+  - "the{noun}{verb}er"
+  - "{topic_word}with{first}"
+  - "{adjective}_{noun}"
+  - "{first}_{country_adj}"
+  - "{noun}vibes{nn}"
+  - "its{first}official"
+  - "xoxo.{topic_word}"
+  - "{first}{last}_{nn}"
+
+# Faker locale per country ISO code
+faker_locales:
+  US: en_US
+  GB: en_GB
+  BR: pt_BR
+  JP: ja_JP
+  KR: ko_KR
+  IN: hi_IN
+  DE: de_DE
+  MX: es_MX
+  ID: id_ID
+  VN: vi_VN
+  PH: en_PH
+  NG: en_NG
+
+# Adjectives used in username pattern {adjective}
+username_adjectives:
+  - cool
+  - epic
+  - real
+  - daily
+  - wild
+  - tiny
+  - golden
+  - lazy
+  - bold
+  - fresh
+  - dark
+  - sunny
+  - mystic
+  - urban
+  - cozy
+
+# Country suffix used in username pattern {country_adj}
+username_country_suffixes:
+  US: us
+  GB: uk
+  BR: br
+  JP: jp
+  KR: kr
+  IN: in
+  DE: de
+  MX: mx
+  ID: id
+  VN: vn
+  PH: ph
+  NG: ng

@@ -1,0 +1,286 @@
+watch_behavior:
+  description: Derived from big_matrix.csv watch_ratio field. watch_ratio = play_duration / video_duration, clipped to [0,
+    3]. Values > 1 indicate replay/looping.
+  watch_ratio:
+    stats:
+      mean: 0.857924
+      std: 0.695664
+      min: 0.0
+      max: 3.0
+      p5: 0.054478
+      p10: 0.113136
+      p25: 0.314825
+      p50: 0.723471
+      p75: 1.177644
+      p90: 1.78399
+      p95: 2.335096
+      p99: 3.0
+    histogram:
+      bin_edges:
+      - 0.0
+      - 0.15
+      - 0.3
+      - 0.45
+      - 0.6
+      - 0.75
+      - 0.9
+      - 1.05
+      - 1.2
+      - 1.35
+      - 1.5
+      - 1.65
+      - 1.8
+      - 1.95
+      - 2.1
+      - 2.25
+      - 2.4
+      - 2.55
+      - 2.7
+      - 2.85
+      - 3.0
+      counts:
+      - 1640028
+      - 1378480
+      - 1109737
+      - 1151494
+      - 1191413
+      - 1109068
+      - 1049332
+      - 884472
+      - 648174
+      - 482698
+      - 369383
+      - 291036
+      - 223890
+      - 175345
+      - 137131
+      - 103519
+      - 83006
+      - 64053
+      - 51975
+      - 386572
+    positive_signal_rate: 0.453527
+    skip_rate: 0.13088
+  video_duration_seconds:
+    description: Video duration in seconds (raw field was milliseconds).
+    stats:
+      mean: 14.621568
+      std: 19.834742
+      min: 0.14
+      max: 315.071991
+      p5: 5.467
+      p10: 6.067
+      p25: 7.434
+      p50: 9.636
+      p75: 12.179
+      p90: 24.242001
+      p95: 46.234001
+      p99: 133.097
+    histogram_clipped_600s:
+      bin_edges:
+      - 0.0
+      - 30.0
+      - 60.0
+      - 90.0
+      - 120.0
+      - 150.0
+      - 180.0
+      - 210.0
+      - 240.0
+      - 270.0
+      - 300.0
+      - 330.0
+      - 360.0
+      - 390.0
+      - 420.0
+      - 450.0
+      - 480.0
+      - 510.0
+      - 540.0
+      - 570.0
+      - 600.0
+      counts:
+      - 11526604
+      - 685955
+      - 111815
+      - 52881
+      - 124482
+      - 16916
+      - 2068
+      - 2723
+      - 0
+      - 5881
+      - 1481
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+  mean_videos_viewed_per_user: 1746.21
+  distinct_users_in_big_matrix: 7176
+user_social:
+  description: >
+    Raw social counts from user_features.csv, with follow_user_num and fans_user_num
+    OVERRIDDEN to TikTok-calibrated lognormal fits. KuaiRec (Kuaishou) has a closed
+    social graph (median 2 followers) which is not representative of TikTok's open,
+    viral follower dynamics. The override targets observed TikTok distributions:
+    median user ~665 followers, power-law tail reaching millions for top creators.
+  follow_user_num:
+    description: >
+      How many accounts this user follows. TikTok users typically follow 100-500 accounts;
+      power users follow 1000+. Lognormal mu=5.2 sigma=1.5 → median ~181, p90 ~1243.
+    stats:
+      mean: 558.0
+      std: 1200.0
+      min: 0.0
+      max: 10000.0
+      p5: 15.0
+      p10: 27.0
+      p25: 66.0
+      p50: 181.0
+      p75: 499.0
+      p90: 1243.0
+      p95: 2130.0
+      p99: 5940.0
+    lognormal_fit:
+      mu: 5.2
+      sigma: 1.5
+  fans_user_num:
+    description: >
+      How many followers this user has. TikTok-calibrated: most users have hundreds of
+      followers, creators have tens of thousands, viral creators reach millions.
+      Lognormal mu=6.5 sigma=2.2 → median ~665, p90 ~11k, p99 ~111k.
+      Generators should apply a creator multiplier (x5-x20) on top of this base draw
+      to ensure creators have significantly more followers than regular users.
+    stats:
+      mean: 7490.0
+      std: 65000.0
+      min: 0.0
+      max: 10000000.0
+      p5: 18.0
+      p10: 40.0
+      p25: 151.0
+      p50: 665.0
+      p75: 2941.0
+      p90: 11132.0
+      p95: 24796.0
+      p99: 111485.0
+    lognormal_fit:
+      mu: 6.5
+      sigma: 2.2
+  friend_user_num:
+    description: Mutual follows (friends).
+    stats:
+      mean: 4.494844
+      std: 44.894733
+      min: 0.0
+      max: 1425.0
+      p5: 0.0
+      p10: 0.0
+      p25: 0.0
+      p50: 0.0
+      p75: 1.0
+      p90: 5.0
+      p95: 11.0
+      p99: 49.0
+  register_days:
+    description: Days since account registration.
+    stats:
+      mean: 296.79068
+      std: 286.361359
+      min: 0.0
+      max: 2245.0
+      p5: 50.0
+      p10: 70.0
+      p25: 132.0
+      p50: 225.0
+      p75: 324.0
+      p90: 597.5
+      p95: 955.0
+      p99: 1494.0
+  video_author_fraction: 0.169593
+  total_users_in_user_features: 7176
+video_engagement:
+  description: Derived from item_daily_features.csv. Aggregated per video (sum of all daily rows), filtered to videos with
+    play_cnt >= 10.
+  filtered_video_count: 10703
+  like_rate:
+    mean: 0.035688
+    std: 0.050192
+    p25: 0.008103
+    p50: 0.016654
+    p75: 0.041454
+    p90: 0.087404
+    p95: 0.13534
+  comment_rate:
+    mean: 0.003255
+    std: 0.012443
+    p25: 0.0001
+    p50: 0.000543
+    p75: 0.001956
+    p90: 0.006139
+    p95: 0.012693
+  share_rate:
+    mean: 0.000549
+    std: 0.002024
+    p25: 0.0
+    p50: 7.5e-05
+    p75: 0.000348
+    p90: 0.001103
+    p95: 0.002221
+  download_rate:
+    mean: 0.000504
+    std: 0.002412
+    p25: 0.0
+    p50: 9.5e-05
+    p75: 0.000331
+    p90: 0.000985
+    p95: 0.001871
+  follow_rate:
+    mean: 0.003546
+    std: 0.007084
+    p25: 0.000499
+    p50: 0.001236
+    p75: 0.00341
+    p90: 0.008883
+    p95: 0.014521
+  complete_rate:
+    mean: 0.446508
+    std: 0.174949
+    p25: 0.318894
+    p50: 0.452049
+    p75: 0.57936
+    p90: 0.672599
+    p95: 0.716248
+  play_count:
+    description: Total plays per video (all-time, aggregated).
+    stats:
+      mean: 3021446.25
+      std: 7783157.0
+      min: 10.0
+      max: 161942208.0
+      p5: 187.0
+      p10: 639.4
+      p25: 4466.0
+      p50: 75224.0
+      p75: 1438640.5
+      p90: 9827770.4
+      p95: 18088099.2
+      p99: 40772591.84
+    lognormal_fit:
+      mu: 11.240973
+      sigma: 3.596074
+social_graph:
+  description: Derived from social_network.csv (mutual follow / friend graph).
+  friends_per_user:
+    mean: 1.419492
+    std: 0.85239
+    p50: 1.0
+    p90: 2.0
+    max: 5.0
+  has_friend_fraction: 1.0
+  total_users_in_social_network: 472

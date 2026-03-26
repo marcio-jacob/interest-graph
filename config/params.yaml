@@ -1,0 +1,180 @@
+# =============================================================================
+# params.yaml — Master simulation parameters
+# Nothing should be hardcoded in generators; read everything from here.
+# =============================================================================
+
+seed: 42
+
+# -----------------------------------------------------------------------------
+# Scale — how many nodes to generate
+# Use --scale small|medium|large CLI flag to override num_users / num_videos.
+# -----------------------------------------------------------------------------
+scale:
+  num_users: 500
+  creator_fraction: 0.17        # fraction of users who are creators (from KuaiRec: 0.169593)
+  num_videos: 2000              # total videos across all creators
+  num_countries: 12
+  num_topics: 12
+  num_sounds: 30
+
+  # Overrides per --scale flag
+  presets:
+    small:
+      num_users: 100
+      num_videos: 400
+    medium:
+      num_users: 500
+      num_videos: 2000
+    large:
+      num_users: 1000
+      num_videos: 4000
+
+# -----------------------------------------------------------------------------
+# Date range for the simulation
+# -----------------------------------------------------------------------------
+dates:
+  sim_start: "2025-01-01"
+  sim_end:   "2025-12-31"
+
+# -----------------------------------------------------------------------------
+# Session generation
+# -----------------------------------------------------------------------------
+sessions:
+  sessions_per_user_min: 5
+  sessions_per_user_max: 40
+  sessions_per_user_lognormal_mu: 2.4    # log-normal: median ~11 sessions/user
+  sessions_per_user_lognormal_sigma: 0.8
+
+  videos_per_session_min: 8
+  videos_per_session_max: 80
+  videos_per_session_mean: 28            # higher engagement: more videos per session
+
+  session_duration_minutes_min: 5
+  session_duration_minutes_max: 120
+
+  # Probability that a session falls on a weekend (slightly higher)
+  weekend_session_probability: 0.32
+
+# -----------------------------------------------------------------------------
+# Interaction rates
+# These are STARTING defaults; distributions.yaml values override them
+# where available (the generators always prefer distributions.yaml).
+# -----------------------------------------------------------------------------
+interactions:
+  # Watch behaviour
+  skip_threshold: 0.15           # watch_ratio below this → SKIPPED (not VIEWED)
+  watch_positive_threshold: 0.8  # watch_ratio >= this → positive engagement signal
+
+  # Action probabilities  (conditional on VIEWED, not SKIPPED)
+  like_rate: 0.08                # increased for denser graph
+  comment_rate: 0.012            # increased for more comment nodes
+  repost_rate: 0.005             # slightly below share_rate
+  share_rate: 0.001              # from KuaiRec mean share_rate
+
+  # Boost multipliers applied when completion_rate >= watch_positive_threshold
+  like_boost_on_completion: 2.0
+  comment_boost_on_like: 2.5     # user more likely to comment if they liked
+
+# -----------------------------------------------------------------------------
+# Interest score feedback loop
+# Applied per (user, topic/entity/hashtag) after each interaction.
+# Scores are accumulated across all sessions then normalised to [0, 1].
+# -----------------------------------------------------------------------------
+interest:
+  skip_delta:     -0.30
+  view_partial:   +0.10          # viewed but completion < watch_positive_threshold
+  view_complete:  +0.50          # completion >= watch_positive_threshold
+  like_delta:     +0.70
+  comment_delta:  +0.60
+  repost_delta:   +0.80
+  min_score_threshold: 0.05      # prune INTERESTED_IN edges below this after normalisation
+
+# -----------------------------------------------------------------------------
+# Social graph — follow relationships
+# -----------------------------------------------------------------------------
+social:
+  follow_power_law_alpha: 2.1    # Zipf alpha; lower = more concentration at top creators
+  max_following: 10000           # hard cap on how many users one user can follow
+  engagement_score_min: 0.1
+  engagement_score_max: 1.0
+
+  # Fraction of a user's follows that must target creators
+  # (ensures creators accumulate followers)
+  min_creator_follow_fraction: 0.40
+
+# -----------------------------------------------------------------------------
+# Video generation
+# -----------------------------------------------------------------------------
+videos:
+  # Number of hashtags to assign per video (uniform range)
+  hashtags_per_video_min: 2
+  hashtags_per_video_max: 5
+
+  # Number of entities to assign per video
+  entities_per_video_min: 0
+  entities_per_video_max: 3
+
+  # Secondary topic probability (a video can belong to 1 primary + 0-1 secondary topic)
+  secondary_topic_probability: 0.35
+
+  # Probability that a video's country matches the creator's country
+  video_country_matches_creator: 0.75
+
+  # View count for computing likes/comments/shares on the Video node
+  # sampled from a Zipf-like distribution; these are the lognormal params
+  # for the TOTAL play count per video (from KuaiRec item_daily_features)
+  play_count_lognormal_mu: 11.24
+  play_count_lognormal_sigma: 3.60
+
+# -----------------------------------------------------------------------------
+# Feed composition — controls which videos appear in a user's session
+# -----------------------------------------------------------------------------
+feed:
+  # Cold-start (first session): entirely random, biased by country
+  cold_start_country_bias: 0.50  # probability of seeing a video from user's own country
+
+  # Warm sessions: split between interest-matched and exploratory
+  interest_matched_fraction: 0.60
+  exploratory_fraction: 0.40
+
+  # Topic affinity bonus — when matching videos to users via interest scores,
+  # use this as a soft-max temperature (higher = more peaked toward top topics)
+  softmax_temperature: 1.5
+
+# -----------------------------------------------------------------------------
+# LLM text generation
+# -----------------------------------------------------------------------------
+llm:
+  model: "Qwen/Qwen2.5-3B"      # HuggingFace model (4-bit quantized, fits 6GB VRAM)
+  max_new_tokens: 60
+  temperature: 0.9
+  description_max_sentences: 4
+  comment_max_sentences: 3
+  request_timeout_seconds: 30
+
+# -----------------------------------------------------------------------------
+# Neo4j upload
+# -----------------------------------------------------------------------------
+neo4j:
+  batch_size: 500               # rows per UNWIND transaction
+  max_retries: 3
+  retry_delay_seconds: 2
+
+# -----------------------------------------------------------------------------
+# Comment generation
+# Sentiment distribution per topic (positive / neutral / negative weights)
+# Must sum to 1.0 per topic.
+# -----------------------------------------------------------------------------
+comment_sentiment_weights:
+  cooking_food:          [0.80, 0.15, 0.05]
+  gaming_esports:        [0.55, 0.25, 0.20]
+  fashion_beauty:        [0.70, 0.20, 0.10]
+  fitness_wellness:      [0.85, 0.10, 0.05]
+  travel_adventure:      [0.90, 0.08, 0.02]
+  music_dance:           [0.75, 0.15, 0.10]
+  comedy_entertainment:  [0.70, 0.20, 0.10]
+  technology_science:    [0.50, 0.35, 0.15]
+  sports_athletics:      [0.60, 0.20, 0.20]
+  education_tutorials:   [0.80, 0.15, 0.05]
+  art_creativity:        [0.85, 0.12, 0.03]
+  lifestyle_vlog:        [0.65, 0.25, 0.10]

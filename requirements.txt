@@ -1,0 +1,15 @@
+pandas>=2.0
+numpy>=1.26
+scipy
+pyyaml
+faker
+neo4j
+requests
+tqdm
+python-dotenv
+kagglehub
+pyarrow>=14.0
+graphdatascience>=1.10
+transformers>=4.40
+bitsandbytes>=0.43
+torch>=2.2
