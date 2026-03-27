@@ -292,7 +292,7 @@ def generate_interactions(
                     skips.append({"session_id": sid, "video_id": vid})
                     delta = skip_delta
                 else:
-                    cr = min(1.0, watch_ratio)
+                    cr = watch_ratio  # raw ratio; can exceed 1.0 for replays
                     views.append({
                         "session_id":    sid,
                         "video_id":      vid,

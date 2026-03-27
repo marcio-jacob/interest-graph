@@ -78,7 +78,8 @@ RETURN
     WHEN r.completion_rate < 0.15 THEN 'skip-level (<15%)'
     WHEN r.completion_rate < 0.40 THEN 'partial (15-40%)'
     WHEN r.completion_rate < 0.80 THEN 'engaged (40-80%)'
-    ELSE 'completed (80%+)'
+    WHEN r.completion_rate < 1.00 THEN 'completed (80-100%)'
+    ELSE 'replay (>100%)'
   END AS bucket,
   count(*) AS views,
   round(count(*) * 100.0 / 306206, 1) AS pct
