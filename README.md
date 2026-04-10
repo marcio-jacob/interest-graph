@@ -205,22 +205,34 @@ Secondary topic receives 0.5× the primary delta. After all sessions: per-user n
 
 `analysis/gds_runner.py` connects to a **Neo4j Aura GDS Session** and runs all algorithms, writing results back to the main database:
 
-| Algorithm | Input Graph | Writeback |
-|---|---|---|
-| Louvain community detection | User-Topic (weighted by `topic_score`) | `User.louvain_community`, `User.community_id` |
-| PageRank — creator influence | Follow graph (weighted by `engagement_score`) | `User.pagerank_score` |
-| View-weighted PageRank | User → Video (weighted by `completion_rate`) | `Video.view_pagerank` |
-| NodeSimilarity (Jaccard) | User-Topic | `SIMILAR_TO{similarity}` relationships |
-| Betweenness centrality | Follow graph | `User.betweenness_centrality` |
-| WCC | Follow graph | `User.wcc_component` |
-| Node2Vec (64-dim) | Full interaction graph | `User.node2vec_embedding`, `Video.node2vec_embedding` |
-| Creator × Topic centrality | Creators + follower interests + PageRank | `Creator.top_topic`, `Creator.top_topic_score` |
+| Algorithm | Input Graph | Writeback | Result |
+|---|---|---|---|
+| Louvain community detection | User-Topic (weighted by `topic_score`) | `User.louvain_community`, `User.community_id` | **12 communities**, modularity 0.3583 |
+| PageRank — creator influence | Follow graph (weighted by `engagement_score`) | `User.pagerank_score` | 1,000 nodes; top creator score 8.52 |
+| View-weighted PageRank | UserSession → Video (weighted by `completion_rate`) | `Video.view_pagerank` | 16,508 nodes (sessions + videos) |
+| NodeSimilarity (Jaccard) | User-Topic | `SIMILAR_TO{similarity}` relationships | **10,000 SIMILAR_TO** pairs |
+| Betweenness centrality | Follow graph | `User.betweenness_centrality` | max 6,799 (bridge users) |
+| WCC | Follow graph | `User.wcc_component` | **1 component** — fully connected |
+| Node2Vec (64-dim) | Full interaction graph (7 rel types, undirected) | `User.node2vec_embedding`, `Video.node2vec_embedding` | **17,700 nodes** embedded; loss 24.8M → 23.5M |
+| Creator × Topic centrality | Creators + follower interests + PageRank | `Creator.top_topic`, `Creator.top_topic_score` | 170 creators with dominant topic |
+
+Full pipeline runs in ~140s on an 8 GB GDS session (Node2Vec ~90s of that).
+
+**Top 5 creators by PageRank (follow-graph centrality):**
+
+| Username | PageRank score |
+|---|---|
+| sergio_mx | 8.52 |
+| mystic_dramacheck | 8.25 |
+| tiny_cooking | 7.99 |
+| michael.satisfying | 7.81 |
+| sportsclipwithguillermo | 7.76 |
 
 ```bash
-# Run full GDS pipeline
+# Run full GDS pipeline (~140s)
 python analysis/gds_runner.py
 
-# Skip Node2Vec (slow; run separately)
+# Skip Node2Vec (~50s)
 python analysis/gds_runner.py --skip-embeddings
 ```
 
@@ -260,6 +272,24 @@ interest-graph/
 │   ├── kuairec_analysis.py   # Phase 1: fit distributions → distributions.yaml
 │   └── gds_runner.py         # GDS Sessions pipeline — all 8 algorithms + writebacks
 │
+├── ranking/                  # ★ Hybrid recommendation pipeline
+│   ├── candidates.py         # Candidate dataclass + 5 generator adapters (ABC)
+│   ├── session_encoder.py    # Short-term + long-term user context from Neo4j
+│   ├── reranker.py           # Feature reranker: norm_raw × engine_weight + session_align
+│   └── pipeline.py           # RecommendationPipeline orchestrator
+│
+├── bandits/                  # ★ Adaptive engine mixing (Stage 1 RL)
+│   └── contextual.py         # EpsilonGreedyBandit + LinUCBBandit over engine arms
+│
+├── models/                   # ★ Graph neural network scoring
+│   └── graph_sage.py         # Two-hop GraphSAGE mean aggregator (NumPy, no GPU needed)
+│
+├── evaluation/               # ★ Offline evaluation
+│   └── metrics.py            # precision@k, recall@k, NDCG@k, MRR, ILD, novelty, coverage
+│
+├── embeddings/               # ★ Embedding fetch + cosine similarity utilities
+│   └── store.py              # EmbeddingStore: batched fetch + in-memory cache
+│
 ├── queries/
 │   ├── recommendations.cypher  # Content-based, collab filtering, trending, creator rec,
 │   │                           # real-time interest score update
@@ -271,6 +301,143 @@ interest-graph/
 ├── requirements.txt
 └── .env.example
 ```
+
+---
+
+## Hybrid Recommendation Pipeline
+
+The `ranking/` package implements a production-shaped pipeline that merges all five recommendation engines into a single ranked feed.
+
+### Architecture
+
+```
+User request
+    │
+    ▼
+SessionEncoder ──── short-term topics (last 3 sessions)
+                 └─ long-term topics  (INTERESTED_IN_TOPIC scores)
+    │
+    ▼
+┌───────────────────────────────────────────────────────┐
+│  Candidate Generation (parallel, 20 per engine)       │
+│                                                       │
+│  ContentBasedGenerator   — topic × entity × hashtag  │
+│  CollaborativeFiltering  — SIMILAR_TO peer likes      │
+│  EmbeddingRetrieval      — Node2Vec cosine (batched)  │
+│  TrendingGenerator       — global engagement signal   │
+│  CreatorBasedGenerator   — PageRank + social proof    │
+└───────────────────────────────────────────────────────┘
+    │  up to ~100 candidates (deduplicated by video_id)
+    ▼
+FeatureReranker
+    final = norm_raw × engine_weight
+          + session_alignment × 0.3
+          + exploration_bonus (cross-topic serendipity)
+    │
+    ▼
+RankedCandidate list  [rank, final_score, explanation, trace]
+```
+
+### Usage
+
+```python
+from ranking.pipeline import RecommendationPipeline
+
+pipeline = RecommendationPipeline()
+
+# Get top-10 ranked candidates
+feed = pipeline.recommend("6c0f0b07-ce08-4f2b-b9f6-e323acdefc7e", n=10)
+for item in feed:
+    print(f"#{item.rank} [{item.source_engine}] {item.video_id}")
+    print(f"   {item.explanation}")
+
+# Pretty-print with full score traces
+pipeline.explain("6c0f0b07-ce08-4f2b-b9f6-e323acdefc7e", n=10)
+```
+
+### Engine Weights (default blend)
+
+| Engine | Weight | Rationale |
+|---|:---:|---|
+| `content_based` | 1.0 | Baseline; direct topic relevance |
+| `collab_filter` | 1.2 | Peer-validated → fewest false positives |
+| `embedding` | 0.9 | Structural signal; penalised to avoid noise |
+| `trending` | 0.6 | Global; lowest personalisation |
+| `creator` | 0.8 | Good for discovery; lower confidence than content/CF |
+
+Override at construction: `RecommendationPipeline(engine_weights={"collab_filter": 1.5, ...})`
+
+### Candidate dataclass
+
+Every engine outputs structured `Candidate` objects:
+
+```python
+@dataclass
+class Candidate:
+    video_id: str
+    source_engine: str    # "content_based" | "collab_filter" | "embedding" | "trending" | "creator"
+    raw_score: float      # engine's native score
+    explanation: str      # human-readable reason
+    metadata: dict        # topics, creator, peer_count, cosine, etc.
+```
+
+After reranking, each becomes a `RankedCandidate` with `final_score`, `rank`, and `explanation_trace`.
+
+---
+
+## Adaptive Engine Mixing (Bandits)
+
+`bandits/contextual.py` provides two contextual bandits for learning which engines
+work best for each user context:
+
+```python
+from bandits.contextual import EpsilonGreedyBandit, LinUCBBandit, BanditContext
+
+bandit = LinUCBBandit(alpha=0.5)
+context = BanditContext(
+    dominant_topic_score=1.0,    # max topic interest
+    topic_diversity=0.3,         # normalised entropy
+    avg_session_completion=0.85, # recent avg completion
+    has_peers=True,
+    has_embeddings=True,
+)
+
+# Select 3 engines to activate for this request
+engines = bandit.select_engines(context, n_engines=3)
+
+# After serving content and observing completion_rate:
+bandit.update("collab_filter", context, reward=0.92)
+```
+
+**Stage 1** (now): bandit selects engine subset; weights are then used by `FeatureReranker`.
+**Stage 2**: slate bandit for position-level ordering.
+**Stage 3**: full RL policy gradient once reward attribution is reliable.
+
+---
+
+## Offline Evaluation
+
+```python
+from evaluation.metrics import evaluate_recommendations
+
+results = evaluate_recommendations(
+    ranked=["v1", "v3", "v7", "v12", "v4"],
+    relevant={"v1", "v7"},
+    topic_map={"v1": ["technology_science"], "v3": ["comedy_entertainment"], ...},
+    popularity={"v1": 0.05, "v3": 0.20, ...},
+    k=5,
+)
+# {
+#   "precision@5": 0.4,
+#   "recall@5":    1.0,
+#   "ndcg@5":      0.7565,
+#   "ild@5":       0.8,      ← intra-list diversity
+#   "novelty@5":   3.24,     ← mean self-information
+# }
+```
+
+Available metrics: `precision_at_k`, `recall_at_k`, `ndcg_at_k`, `mrr`,
+`intra_list_diversity`, `novelty_at_k`, `coverage`, `catalog_entropy`.
 
 ---
 
